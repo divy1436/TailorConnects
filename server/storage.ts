@@ -91,21 +91,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchTailors(location?: string, serviceType?: string, rating?: number): Promise<TailorWithUser[]> {
-    let query = db
-      .select()
-      .from(tailors)
-      .leftJoin(users, eq(tailors.userId, users.id))
-      .where(eq(tailors.isVerified, true));
+    let whereConditions = [eq(tailors.isVerified, true)];
 
     if (location) {
-      query = query.where(ilike(tailors.location, `%${location}%`));
+      whereConditions.push(ilike(tailors.location, `%${location}%`));
     }
 
     if (rating) {
-      query = query.where(sql`${tailors.rating} >= ${rating}`);
+      whereConditions.push(sql`${tailors.rating} >= ${rating}`);
     }
 
-    const results = await query.orderBy(desc(tailors.rating));
+    const results = await db
+      .select()
+      .from(tailors)
+      .leftJoin(users, eq(tailors.userId, users.id))
+      .where(and(...whereConditions))
+      .orderBy(desc(tailors.rating));
     
     return results
       .filter(result => result.tailors && result.users)

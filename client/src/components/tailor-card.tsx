@@ -60,7 +60,7 @@ export default function TailorCard({ tailor }: TailorCardProps) {
 
         <div className="mt-4">
           <div className="flex flex-wrap gap-2 mb-4">
-            {tailor.specializations.map((spec, index) => (
+            {tailor.specializations?.map((spec, index) => (
               <Badge key={index} variant="outline" className="text-xs">
                 {spec}
               </Badge>

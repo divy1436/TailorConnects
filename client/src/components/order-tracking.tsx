@@ -17,7 +17,8 @@ const statusSteps = {
   ready: { step: 5, label: "Ready", icon: CheckCircle },
   out_for_delivery: { step: 6, label: "Out for Delivery", icon: Truck },
   delivered: { step: 7, label: "Delivered", icon: CheckCircle },
-};
+  cancelled: { step: 0, label: "Cancelled", icon: CheckCircle },
+} as const;
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",

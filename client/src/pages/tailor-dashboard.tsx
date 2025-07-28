@@ -20,7 +20,8 @@ import {
   Plus,
   Settings,
   BarChart3,
-  Wallet
+  Wallet,
+  Star
 } from "lucide-react";
 import type { OrderWithDetails } from "@shared/schema";
 

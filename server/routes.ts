@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcrypt";
@@ -7,8 +7,20 @@ import { insertUserSchema, insertTailorSchema, insertOrderSchema, insertReviewSc
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        userId: string;
+        userType: string;
+      };
+    }
+  }
+}
+
 // Middleware to verify JWT token
-const authenticateToken = (req: any, res: any, next: any) => {
+const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -125,6 +137,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Order routes
   app.post("/api/orders", authenticateToken, async (req, res) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const orderData = insertOrderSchema.parse({
         ...req.body,
         customerId: req.user.userId,
@@ -139,6 +154,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/orders/customer", authenticateToken, async (req, res) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const orders = await storage.getOrdersByCustomer(req.user.userId);
       res.json(orders);
     } catch (error) {
@@ -180,6 +198,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Review routes
   app.post("/api/reviews", authenticateToken, async (req, res) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const reviewData = insertReviewSchema.parse({
         ...req.body,
         customerId: req.user.userId,
@@ -210,6 +231,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User profile routes
   app.get("/api/users/me", authenticateToken, async (req, res) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const user = await storage.getUser(req.user.userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });

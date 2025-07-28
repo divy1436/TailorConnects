@@ -264,7 +264,7 @@ export default function Booking() {
                   </div>
                 </div>
 
-                {tailor.specializations.length > 0 && (
+                {tailor.specializations && tailor.specializations.length > 0 && (
                   <div>
                     <h4 className="font-semibold text-navy mb-2">Specializations</h4>
                     <div className="flex flex-wrap gap-2">
